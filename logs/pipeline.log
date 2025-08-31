@@ -1,0 +1,12 @@
+2025-08-31 12:54:00,528 - INFO - EXTRACT: copiado C:\Users\Carlos\OneDrive\Desktop\integrador3\elt_airbnb_nyc\data\raw\airbnb\AB_NYC.csv -> C:\Users\Carlos\OneDrive\Desktop\integrador3\elt_airbnb_nyc\data\raw\airbnb\ab_nyc_20250831.csv
+2025-08-31 12:54:02,357 - INFO - LOAD: ab_nyc_20250831.csv -> raw.airbnb_listings
+2025-08-31 12:54:04,058 - INFO - STAGING: removed_duplicates=0, rows=48884
+2025-08-31 12:54:04,594 - INFO - CORE: dims y fact generadas
+2025-08-31 12:55:09,099 - INFO - GOLD: CSVs generados en data/gold
+2025-08-31 12:55:13,512 - INFO - GOLD: CSVs generados en data/gold
+2025-08-31 12:55:18,338 - INFO - GOLD: CSVs generados en data/gold
+2025-08-31 12:55:31,761 - INFO - EXTRACT: copiado C:\Users\Carlos\OneDrive\Desktop\integrador3\elt_airbnb_nyc\data\raw\airbnb\AB_NYC.csv -> C:\Users\Carlos\OneDrive\Desktop\integrador3\elt_airbnb_nyc\data\raw\airbnb\ab_nyc_20250831.csv
+2025-08-31 12:55:33,813 - INFO - LOAD: ab_nyc_20250831.csv -> raw.airbnb_listings
+2025-08-31 12:55:35,564 - INFO - STAGING: removed_duplicates=0, rows=48884
+2025-08-31 12:55:36,008 - INFO - CORE: dims y fact generadas
+2025-08-31 12:55:36,279 - INFO - GOLD: CSVs generados en data/gold
