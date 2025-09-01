@@ -1,0 +1,19 @@
+jobs:
+  - type: api
+    name: httpbin_get_ip
+    endpoint: https://httpbin.org/ip
+    method: GET
+
+  - type: api
+    name: httpbin_get_headers
+    endpoint: https://httpbin.org/headers
+    method: GET
+
+  - type: scrape
+    name: python_org_home
+    url: https://www.python.org/
+
+  # Si querés sumarlo: página HTML simple
+  - type: scrape
+    name: httpbin_html
+    url: https://httpbin.org/html
