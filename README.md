@@ -1,87 +1,62 @@
-Proyecto Integrador — Avances 1, 2 y 3
-🎯 Objetivo General
+# Proyecto Integrador — Avances 1, 2 y 3
 
-Diseñar e implementar un pipeline ELT escalable que integre datos de múltiples fuentes, los cargue en un Data Warehouse y los transforme en datasets listos para análisis de negocio.
+## 🎯 Objetivo General
+Diseñar e implementar un **pipeline ELT** escalable que integre datos de múltiples fuentes, los cargue en un **Data Warehouse** y los transforme en datasets listos para análisis de negocio.  
 
-El proyecto se desarrolla en tres entregas:
+El proyecto se desarrolla en **tres entregas**:
 
-Avance 1: Pipeline ELT base con CSV Airbnb NYC → DWH local (DuckDB).
+1. **Avance 1:** Pipeline ELT base con CSV Airbnb NYC → DWH local (DuckDB).  
+2. **Avance 2:** Recolección desde **APIs y Scraping**, contenerización con Docker, validación en capa raw.  
+3. **Avance 3:** Transformaciones avanzadas en **SQL/Python**, integración de datos no estructurados, validación de capas staging/core/gold.  
 
-Avance 2: Recolección desde APIs y Scraping, contenerización con Docker, validación en capa raw.
+---
 
-Avance 3: Transformaciones avanzadas en SQL/Python, integración de datos no estructurados, validación de capas staging/core/gold.
+## 🏗️ Avance 1 — Pipeline ELT + Data Warehouse
 
-🏗️ Avance 1 — Pipeline ELT + Data Warehouse
+**Fuentes:**  
+- CSV: `AB_NYC.csv` (Airbnb NYC dataset)
 
-Fuentes:
+**Pipeline:**  
+- **Extract:** copia de CSV a `data/raw/airbnb/` con fecha.  
+- **Load:** carga en `raw.airbnb_listings` (DuckDB).  
+- **Transform:** limpieza en staging, modelo dimensional en core, KPIs en gold.  
 
-CSV: AB_NYC.csv (Airbnb NYC dataset)
+**Data Warehouse (DuckDB):**  
+- `raw` → crudo  
+- `staging` → limpio, tipificado  
+- `core` → hechos + dimensiones  
+- `gold` → datasets finales  
 
-Pipeline:
+**Resultados principales:**  
+- `gold.avg_price_by_area.csv`  
+- `gold.room_type_offer.csv`  
+- `gold.room_type_revenue_proxy.csv`  
+- `gold.top_hosts.csv`  
+- `gold.availability_by_district.csv`  
+- `gold.reviews_monthly_by_ng.csv`  
 
-Extract: copia de CSV a data/raw/airbnb/ con fecha.
+**Preguntas Q1–Q8 resueltas** en [`notebooks/analisis_airbnb.ipynb`](notebooks/analisis_airbnb.ipynb).  
 
-Load: carga en raw.airbnb_listings (DuckDB).
+---
 
-Transform: limpieza en staging, modelo dimensional en core, KPIs en gold.
+## 🌐 Avance 2 — Extracción desde APIs y Scraping + Docker
 
-Data Warehouse (DuckDB):
+**Novedades:**  
+- Scripts Python parametrizados por YAML:
+  - `extract_api.py` (APIs con requests + reintentos).  
+  - `extract_scrape.py` (web scraping con BeautifulSoup).  
+  - `run_extract.py` (ejecuta jobs definidos en `config/extract_config.yaml`).  
+- Validación de archivos raw (`validate_raw.py`) → genera `docs/raw_validation_report.md`.  
+- Convención de nombres: `fuente_fecha.json`.  
+- Manifest automático `_manifest.csv`.  
+- **Dockerfile**:  
+  - Imagen base: `python:3.10-slim`  
+  - Instala `requirements.txt`  
+  - Copia scripts y config  
+  - `ENTRYPOINT` → `run_extract.py`  
 
-raw → crudo
-
-staging → limpio, tipificado
-
-core → hechos + dimensiones
-
-gold → datasets finales
-
-Resultados principales:
-
-gold.avg_price_by_area.csv
-
-gold.room_type_offer.csv
-
-gold.room_type_revenue_proxy.csv
-
-gold.top_hosts.csv
-
-gold.availability_by_district.csv
-
-gold.reviews_monthly_by_ng.csv
-
-Preguntas Q1–Q8 resueltas en notebooks/analisis_airbnb.ipynb
-.
-
-🌐 Avance 2 — Extracción desde APIs y Scraping + Docker
-
-Novedades:
-
-Scripts Python parametrizados por YAML:
-
-extract_api.py (APIs con requests + reintentos).
-
-extract_scrape.py (web scraping con BeautifulSoup).
-
-run_extract.py (ejecuta jobs definidos en config/extract_config.yaml).
-
-Validación de archivos raw (validate_raw.py) → genera docs/raw_validation_report.md.
-
-Convención de nombres: fuente_fecha.json.
-
-Manifest automático _manifest.csv.
-
-Dockerfile:
-
-Imagen base: python:3.10-slim
-
-Instala requirements.txt
-
-Copia scripts y config
-
-ENTRYPOINT → run_extract.py
-
-Ejemplo de jobs:
-
+**Ejemplo de jobs:**
+```yaml
 jobs:
   - type: api
     name: httpbin_get_ip
@@ -89,17 +64,7 @@ jobs:
   - type: scrape
     name: python_org_home
     url: https://www.python.org/
-
-
-Resultados:
-
-Archivos .json en data/raw/external/.
-
-Validación OK → reporte con tamaño, formato y estado.
-
-Imagen Docker lista para docker build y docker run.
-
-🔄 Avance 3 — Transformaciones avanzadas + integración no estructurado
+ 🔄 Avance 3 — Transformaciones avanzadas + integración no estructurado
 
 Objetivo: convertir datos crudos en información útil para negocio, integrando fuentes estructuradas y no estructuradas.
 
@@ -189,3 +154,10 @@ Avance 3
  Integración datos no estructurados (texto + JSON externos)
 
  Validación de staging/core/gold
+
+
+---
+
+Si lo copiás así directo a `README.md`, en GitHub se va a renderizar con títulos, listas, tablas y bloques de código exactamente como lo ves acá.  
+
+¿Querés que además te arme un **diagrama en ASCII o mermaid** (que se renderiza en GitHub) mostrando el flujo CSV + APIs + Scraping → raw → staging → core → gold?
