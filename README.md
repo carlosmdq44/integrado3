@@ -1,133 +1,191 @@
-# Proyecto Integrador — Primer Avance
-## Pipeline ELT + Data Warehouse (Airbnb NYC)
+Proyecto Integrador — Avances 1, 2 y 3
+🎯 Objetivo General
 
-### 🎯 Objetivo del pipeline
-Diseñar e implementar un **pipeline ELT** que integre datos de múltiples fuentes, los cargue en un Data Warehouse escalable y los transforme en datasets listos para análisis y visualización, respondiendo preguntas clave del negocio.
+Diseñar e implementar un pipeline ELT escalable que integre datos de múltiples fuentes, los cargue en un Data Warehouse y los transforme en datasets listos para análisis de negocio.
 
----
+El proyecto se desarrolla en tres entregas:
 
-## 🏗️ Arquitectura general
+Avance 1: Pipeline ELT base con CSV Airbnb NYC → DWH local (DuckDB).
 
-**Fuentes de datos:**
-- CSV: `AB_NYC.csv` (Airbnb NYC dataset)
-- Futuro: APIs, bases internas, sensores
+Avance 2: Recolección desde APIs y Scraping, contenerización con Docker, validación en capa raw.
 
-**Pipeline ELT:**
+Avance 3: Transformaciones avanzadas en SQL/Python, integración de datos no estructurados, validación de capas staging/core/gold.
 
-1. **Extract (E)** → copiamos el CSV original en la carpeta `data/raw/airbnb/` con fecha (ej. `ab_nyc_20250831.csv`).  
-2. **Load (L)** → cargamos los datos sin transformar en DuckDB (`raw.airbnb_listings`).  
-3. **Transform (T)** → realizamos transformaciones en Python + DuckDB:
-   - Limpieza (staging)
-   - Modelado dimensional (core)
-   - Agregados y KPIs listos para negocio (gold)
+🏗️ Avance 1 — Pipeline ELT + Data Warehouse
 
-**Data Warehouse (DuckDB, local):**
-- `raw` → datos crudos
-- `staging` → datos limpios, tipificados, sin duplicados, con `price_winsor` (outliers controlados)
-- `core` → modelo de negocio (hechos y dimensiones)
-- `gold` → datasets listos para análisis y BI
+Fuentes:
 
-**Orquestación:**  
-- Por ahora, un script `run.py` que ejecuta todo el pipeline paso a paso.  
-- Futuro: Apache Airflow para DAGs.
+CSV: AB_NYC.csv (Airbnb NYC dataset)
 
-**CI/CD:**  
-- Por ahora, `quality_checks.py` asegura unicidad de IDs, precios válidos y tablas core no vacías.  
-- Futuro: GitHub Actions para automatizar tests y despliegues.
+Pipeline:
 
----
+Extract: copia de CSV a data/raw/airbnb/ con fecha.
 
-## 📂 Estructura del proyecto
+Load: carga en raw.airbnb_listings (DuckDB).
 
-```
+Transform: limpieza en staging, modelo dimensional en core, KPIs en gold.
+
+Data Warehouse (DuckDB):
+
+raw → crudo
+
+staging → limpio, tipificado
+
+core → hechos + dimensiones
+
+gold → datasets finales
+
+Resultados principales:
+
+gold.avg_price_by_area.csv
+
+gold.room_type_offer.csv
+
+gold.room_type_revenue_proxy.csv
+
+gold.top_hosts.csv
+
+gold.availability_by_district.csv
+
+gold.reviews_monthly_by_ng.csv
+
+Preguntas Q1–Q8 resueltas en notebooks/analisis_airbnb.ipynb
+.
+
+🌐 Avance 2 — Extracción desde APIs y Scraping + Docker
+
+Novedades:
+
+Scripts Python parametrizados por YAML:
+
+extract_api.py (APIs con requests + reintentos).
+
+extract_scrape.py (web scraping con BeautifulSoup).
+
+run_extract.py (ejecuta jobs definidos en config/extract_config.yaml).
+
+Validación de archivos raw (validate_raw.py) → genera docs/raw_validation_report.md.
+
+Convención de nombres: fuente_fecha.json.
+
+Manifest automático _manifest.csv.
+
+Dockerfile:
+
+Imagen base: python:3.10-slim
+
+Instala requirements.txt
+
+Copia scripts y config
+
+ENTRYPOINT → run_extract.py
+
+Ejemplo de jobs:
+
+jobs:
+  - type: api
+    name: httpbin_get_ip
+    endpoint: https://httpbin.org/ip
+  - type: scrape
+    name: python_org_home
+    url: https://www.python.org/
+
+
+Resultados:
+
+Archivos .json en data/raw/external/.
+
+Validación OK → reporte con tamaño, formato y estado.
+
+Imagen Docker lista para docker build y docker run.
+
+🔄 Avance 3 — Transformaciones avanzadas + integración no estructurado
+
+Objetivo: convertir datos crudos en información útil para negocio, integrando fuentes estructuradas y no estructuradas.
+
+Scripts principales:
+
+normalize_external.py →
+
+Convierte texto libre (name de listings) en features tabulares (has_wifi, has_pool, etc.).
+
+Normaliza JSON externos (httpbin, scraping) en tablas staging.
+
+sql_runner.py → ejecuta transformaciones SQL.
+
+sql/core_third.sql → crea:
+
+core.listing_text_features
+
+core.fact_listings_enriched (con buckets de disponibilidad).
+
+sql/gold_third.sql → genera datasets de consumo:
+
+gold.avg_price_by_area_room
+
+gold.availability_bucket_by_ng
+
+gold.corr_availability_reviews_by_ng
+
+gold.price_vs_text_features
+
+validate_transform.py → checks automáticos de existencia y consistencia.
+
+Ejemplo de nuevas métricas:
+
+Impacto de has_wifi o is_luxury en el precio promedio.
+
+Correlación entre disponibilidad y cantidad de reseñas por distrito.
+
+Distribución de disponibilidad anual por buckets (0–60, 61–180, etc.).
+
+Resultados:
+
+Validación final: OK VALIDATE TRANSFORM ✔
+
+Nuevas tablas core + gold disponibles en data/warehouse.duckdb.
+
+📂 Estructura consolidada del proyecto
 elt_airbnb_nyc/
 ├─ data/
-│  ├─ raw/airbnb/      # CSVs originales con fecha
-│  ├─ staging/         # CSVs limpios
-│  ├─ core/            # tablas de negocio (DuckDB)
-│  └─ gold/            # datasets agregados para análisis
-├─ scripts/            # extract, load, transform, gold, quality
-├─ notebooks/          # análisis exploratorio (analisis_airbnb.ipynb)
-├─ docs/               # documentación + gráficos generados
-├─ logs/               # logs de ejecución
-├─ run.py              # orquestador del pipeline
-└─ .env                # configuración de rutas
-```
+│  ├─ raw/               # CSV/JSON originales
+│  ├─ staging/           # CSV limpios / features tabulares
+│  ├─ core/              # modelo de negocio
+│  ├─ gold/              # datasets finales
+│  └─ warehouse.duckdb   # DWH local
+├─ scripts/
+│  ├─ extract_*.py       # extracción (APIs, scraping)
+│  ├─ normalize_external.py
+│  ├─ sql_runner.py
+│  ├─ validate_transform.py
+│  └─ quality_checks.py
+├─ sql/                  # transformaciones SQL (core, gold)
+├─ config/               # extract_config.yaml
+├─ notebooks/            # analisis_airbnb.ipynb
+├─ docs/                 # documentación + reportes
+├─ Dockerfile            # extractor (avance 2)
+└─ run.py                # pipeline avance 1
 
----
+✅ Estado de entregas
 
-## 🚀 Ejecución del pipeline
+Avance 1
 
-1. Crear entorno virtual e instalar dependencias:
+ Pipeline ELT (CSV → raw → staging → core → gold)
 
-```bash
-python -m venv .venv
-source .venv/bin/activate      # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-```
+ Respuestas Q1–Q8 en notebook
 
-2. Ejecutar el pipeline pasando la ruta al CSV original:
+Avance 2
 
-```bash
-python run.py "data/raw/airbnb/AB_NYC.csv"
-```
+ Extracción APIs + Scraping (YAML configurable)
 
-3. Resultados:
-- Warehouse DuckDB en `data/warehouse.duckdb`
-- Staging CSV en `data/staging/airbnb_listings_clean.csv`
-- Tablas core en DuckDB (`core.*`)
-- Archivos gold en `data/gold/`:
-  - `avg_price_by_area.csv`
-  - `room_type_offer.csv`
-  - `room_type_revenue_proxy.csv`
-  - `top_hosts.csv`
-  - `availability_by_district.csv`
-  - `reviews_monthly_by_ng.csv`
+ Validación capa raw + reporte
 
----
+ Contenerización con Docker
 
-## 📊 Preguntas de negocio abordadas (Q1–Q8)
+Avance 3
 
-1. Precio promedio por barrio y distrito → `avg_price_by_area.csv`
-2. Tipo de habitación más ofrecido y revenue estimado → `room_type_offer.csv` + `room_type_revenue_proxy.csv`
-3. Anfitriones con más propiedades y variación de precios → `top_hosts.csv` + análisis en staging
-4. Disponibilidad anual por barrio/tipo → `availability_by_district.csv` + query extra
-5. Evolución de reseñas mensuales por distrito → `reviews_monthly_by_ng.csv`
-6. Barrios con mayor concentración de alojamientos activos → query en staging
-7. Distribución de precios y outliers → comparación `price` vs `price_winsor`
-8. Relación entre disponibilidad y reseñas → scatter + correlación
+ Transformaciones avanzadas SQL/Python
 
-Todos los análisis están documentados en el notebook:  
-👉 [`notebooks/analisis_airbnb.ipynb`](../notebooks/analisis_airbnb.ipynb)
+ Integración datos no estructurados (texto + JSON externos)
 
----
-
-## 🛠️ Justificación de herramientas
-
-- **Python + Pandas**: limpieza y exploración inicial.  
-- **DuckDB**: data warehouse ligero, SQL estándar, soporta tablas por esquema (`raw`, `staging`, `core`, `gold`).  
-- **Matplotlib**: visualización de KPIs.  
-- **dotenv + logging**: buenas prácticas de configuración y trazabilidad.  
-- **Jupyter Notebook**: análisis incremental y presentación.  
-- **Airflow/DBT (futuro)**: escalar orquestación y versionado de transformaciones.  
-- **GitHub Actions (futuro)**: CI/CD automatizado.
-
----
-
-## ✅ Estado del Primer Avance
-
-- [x] Pipeline ELT funcionando end-to-end  
-- [x] Capas de DWH definidas (raw, staging, core, gold)  
-- [x] Tablas gold que responden Q1–Q8  
-- [x] Notebook con análisis y gráficos  
-- [x] Documentación técnica (este README)  
-- [ ] Orquestación Airflow (pendiente próximo avance)  
-- [ ] CI/CD con GitHub Actions (pendiente próximo avance)  
-
----
-
-## 📌 Entregables
-- `docs/README_PrimerAvance.md` (este documento)  
-- `notebooks/analisis_airbnb.ipynb` (respuestas Q1–Q8 con gráficos)  
-- `data/gold/*.csv` (datasets listos para BI)  
-- Capturas de ejecución del pipeline y gráficos en `docs/`
+ Validación de staging/core/gold
