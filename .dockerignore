@@ -1,0 +1,18 @@
+# .dockerignore
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.tmp
+*.swp
+.DS_Store
+.git
+.gitignore
+
+# Salidas locales que no querés copiar a la imagen
+data/gold/
+data/staging/
+data/core/
+data/warehouse.duckdb
