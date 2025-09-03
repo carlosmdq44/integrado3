@@ -23,21 +23,13 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-postgres:5432/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
-      _AIRFLOW_WWW_USER_USERNAME: admin
-      _AIRFLOW_WWW_USER_PASSWORD: admin
       PIP_ADDITIONAL_REQUIREMENTS: >
         pandas==2.2.2 duckdb==1.0.0 requests==2.32.3 httpx==0.27.2
         beautifulsoup4==4.12.3 lxml==5.2.2 tenacity==8.5.0 PyYAML==6.0.2
     entrypoint: /bin/bash
-    command: >
-      -c "airflow db migrate &&
-          airflow users create
-            --role Admin
-            --username $$ _AIRFLOW_WWW_USER_USERNAME
-            --password $$ _AIRFLOW_WWW_USER_PASSWORD
-            --firstname Admin --lastname User --email admin@example.com || true"
+    command: -c "airflow db migrate"
     volumes:
-      - ../:/opt/airflow/project       # monta todo tu repo
+      - ../:/opt/airflow/project
       - ./dags:/opt/airflow/dags
 
   airflow-webserver:
