@@ -197,39 +197,69 @@ docker pull ghcr.io/carlosmdq44/integrador3-elt:latest
 ## 📂 Estructura del Proyecto
 
 elt_airbnb_nyc/
+
 ├─ data/
+
 │ ├─ raw/ # CSV/JSON originales
+
 │ ├─ staging/ # datos limpios
+
 │ ├─ core/ # modelo dimensional
+
 │ ├─ gold/ # datasets listos para BI
+
 │ └─ warehouse.duckdb
+
 ├─ scripts/
+
 │ ├─ extract_*.py
+
 │ ├─ normalize_external.py
+
 │ ├─ sql_runner.py
+
 │ ├─ quality_checks.py
+
 │ └─ validate_transform.py
+
 ├─ sql/
+
 │ ├─ core_third.sql
+
 │ └─ gold_third.sql
+
 ├─ config/
+
 │ └─ extract_config.yaml
+
 ├─ airflow/
+
 │ ├─ docker-compose.yml
+
 │ └─ dags/pipeline_airbnb_runall.py
+
 ├─ notebooks/
+
 │ └─ analisis_airbnb.ipynb
+
 ├─ docs/
+
 │ └─ raw_validation_report.md
+
 ├─ Dockerfile
+
 ├─ docker-compose.yml
+
 ├─ run.py
+
 └─ .github/workflows/
+
 ├─ ci.yml
+
 ├─ pipeline-smoke.yml
+
 └─ docker-publish.yml
 
----
 
 ## ✅ Estado de Entregas
 
