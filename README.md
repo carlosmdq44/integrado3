@@ -15,9 +15,13 @@ El proyecto se desarrolla en **cuatro entregas principales**:
 ## 🏗️ Diagrama General (ASCII – Fallback)
 
 FUENTES
+
 ├─ CSV: AB_NYC.csv
+
 ├─ APIs
+
 └─ Scraping
+
 │
 ▼
 EXTRACCIÓN (Python)
