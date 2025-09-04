@@ -23,48 +23,87 @@ FUENTES
 └─ Scraping
 
 │
+
 ▼
 EXTRACCIÓN (Python)
+
 ├─ extract_api.py
+
 ├─ extract_scrape.py
+
 └─ run_extract.py (config YAML)
+
 │
+
 ▼
+
 RAW (data/raw)
+
 ├─ ab_nyc_YYYYMMDD.csv
+
 ├─ external/.json + manifest.csv
+
 └─ validate_raw.py → docs/raw_validation_report.md
+
 │
 ▼
+
 STAGING (DuckDB)
+
 ├─ airbnb_listings_clean
+
 ├─ listing_text_features
+
 └─ external (JSON normalizado)
+
 │
+
 ▼
+
 CORE (DuckDB)
+
 ├─ fact_listings
+
 ├─ dim_availability_bucket
+
 └─ fact_listings_enriched
+
 │
+
 ▼
+
 GOLD (DuckDB + CSV)
+
 ├─ avg_price_by_area.csv
+
 ├─ room_type_offer.csv
+
 ├─ availability_bucket_by_ng.csv
+
 ├─ corr_availability_reviews_by_ng.csv
+
 └─ price_vs_text_features.csv
+
 │
+
 ▼
+
 CONSUMO
+
 ├─ notebooks/analisis_airbnb.ipynb
+
 └─ Dashboards BI
 
 ORQUESTACIÓN / DEVOPS
+
 ├─ Airflow (DAGs: pipeline_airbnb_runall.py)
+
 ├─ Dockerfile + docker-compose.yml
+
 ├─ GitHub Actions (CI/CD + GHCR)
+
 └─ quality_checks.py / validate_transform.py
+
 
 ---
 
