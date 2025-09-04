@@ -62,9 +62,6 @@ ORQUESTACIÓN / DEVOPS
 ├─ GitHub Actions (CI/CD + GHCR)
 └─ quality_checks.py / validate_transform.py
 
-markdown
-Copiar código
-
 ---
 
 ## 🚀 Avance 1 — Pipeline ELT + Data Warehouse
@@ -152,9 +149,6 @@ Copiar código
 - Imagen disponible en:  
 docker pull ghcr.io/carlosmdq44/integrador3-elt:latest
 
-yaml
-Copiar código
-
 ---
 
 ## 📂 Estructura del Proyecto
@@ -191,9 +185,6 @@ elt_airbnb_nyc/
 ├─ ci.yml
 ├─ pipeline-smoke.yml
 └─ docker-publish.yml
-
-yaml
-Copiar código
 
 ---
 
